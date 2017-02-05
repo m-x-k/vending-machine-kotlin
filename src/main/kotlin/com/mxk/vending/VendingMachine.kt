@@ -9,33 +9,30 @@ import com.mxk.vending.exceptions.NotFoundException
 class VendingMachine {
 
     fun purchaseItem(code: Int, money: Array<Coin>): Result {
-        var funds: Int = getTotalFundsAvailable(money)
-
-        var item = purchaseItemWithFunds(code, funds)
+        val funds: Int = getTotalFundsAvailable(money)
+        val item = purchaseItemWithFunds(code, funds)
 
         return Result(item, calculateChange(item, funds))
     }
 
     private fun purchaseItemWithFunds(code: Int, amount: Int): Item {
-        var item = findItem(code)
+        val item = findItem(code)
         if (item.cost > amount)
             throw InsufficientFundsException("More funds required")
         return item
     }
 
     private fun getTotalFundsAvailable(money: Array<Coin>): Int {
-        var total: Int = calculateTotal(money)
+        val total: Int = calculateTotal(money)
         if (total <= 0)
             throw EmptyFundsException("Money required!: " + total)
         return total
     }
 
     private fun findItem(code: Int): Item {
-        for (i in Item.values()) {
-            if (i.code == code) {
-                return i
-            }
-        }
+        Item.values()
+                .filter { it.code == code }
+                .forEach { return it }
         throw NotFoundException("Unknown Item Selected")
     }
 
@@ -44,10 +41,7 @@ class VendingMachine {
     }
 
     private fun calculateTotal(money: Array<Coin>): Int {
-        var total: Int = 0
-        for (m in money) {
-            total += m.pence
-        }
+        val total: Int = money.sumBy { it.pence }
 
         return total
     }
